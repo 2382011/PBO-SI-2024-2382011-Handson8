@@ -5,7 +5,6 @@ import Views.TodoListTerminalView;
 import Views.TodoListView;
 import repositories.TodoListRepository;
 import repositories.TodoListRepositoryDbImpl;
-import repositories.TodoListRepositoryImpl;
 
 public class Main {
     public static void main(String[] args) {

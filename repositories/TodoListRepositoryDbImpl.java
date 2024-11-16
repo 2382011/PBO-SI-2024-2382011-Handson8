@@ -13,28 +13,27 @@ import java.util.Objects;
 public class TodoListRepositoryDbImpl implements TodoListRepository{
     private final Database database;
 
-    public TodoListRepositoryDbImpl(final Database database){
+    public TodoListRepositoryDbImpl(Database database) {
         this.database = database;
     }
 
     @Override
     public TodoList[] getAll() {
         Connection connection = database.getConnection();
-        String sqlStatement = "SELECTT * FROM todos";
+        String sqlStatement = "SELECT * FROM todos";
         List<TodoList> todoLists = new ArrayList<>();
-        try{
+        try {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
-                TodoList todoList = new TodoList();
+            while (resultSet.next()) {
+                TodoList todoList1 = new TodoList();
                 int id = resultSet.getInt(1);
                 String todo = resultSet.getString(2);
-                todoList.setId(id);
-                todoList.setTodo(todo);
-                todoLists.add(todoList);
+                todoList1.setId(id);
+                todoList1.setTodo(todo);
+                todoLists.add(todoList1);
             }
-
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return todoLists.toArray(TodoList[]::new);
@@ -46,13 +45,13 @@ public class TodoListRepositoryDbImpl implements TodoListRepository{
         Connection conn = database.getConnection();
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(sqlStatement);
-            preparedStatement.setString( 1, todoList.getTodo());
+            preparedStatement.setString(1, todoList.getTodo());
 
             int rowsEffected = preparedStatement.executeUpdate();
-            if (rowsEffected > 0){
+            if (rowsEffected > 0) {
                 System.out.println("Insert successful!");
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -62,42 +61,41 @@ public class TodoListRepositoryDbImpl implements TodoListRepository{
         String sqlStatement = "DELETE FROM todo WHERE id = ?";
         Connection conn = database.getConnection();
         var dbId = getDbId(id);
-        if (dbId == null){
+        if (dbId == null) {
             return false;
         }
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(sqlStatement);
-            preparedStatement.setInt( 1, dbId);
+            preparedStatement.setInt(1, dbId);
 
             int rowsEffected = preparedStatement.executeUpdate();
-            if (rowsEffected > 0){
+            if (rowsEffected > 0) {
                 System.out.println("Delete successful!");
                 return true;
             }
-            return false;
+            return  false;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }
     }
 
-    private Integer getDbId(final Integer id){
+    private Integer getDbId(final Integer id) {
         TodoList[] todoLists = getAll();
         Long countElement = Arrays.stream(todoLists).filter(Objects::nonNull).count();
-        if (countElement.intValue() == 0){
+        if (countElement.intValue() == 0) {
             return null;
         }
         var dbId = todoLists[id - 1].getId();
         return dbId;
     }
 
-
     @Override
     public Boolean edit(final TodoList todoList) {
         String sqlStatement = "UPDATE todo set todo = ? WHERE id = ?";
         Connection conn = database.getConnection();
         var dbId = getDbId(todoList.getId());
-        if (dbId == null){
+        if (dbId == null) {
             return false;
         }
         try {
@@ -106,15 +104,14 @@ public class TodoListRepositoryDbImpl implements TodoListRepository{
             preparedStatement.setInt(2, dbId);
 
             int rowsEffected = preparedStatement.executeUpdate();
-            if (rowsEffected > 0){
+            if (rowsEffected > 0) {
                 System.out.println("Update successful!");
                 return false;
-        }
+            }
             return false;
-    } catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }
-
     }
 }
